@@ -23,26 +23,25 @@ def chebyshev_spectral_sum(func, operator, a, b, shape, deg=20, m=100):
     def scaled_op(x):
         return 2 * operator(x) / (b - a) - (b + a)/(b - a) * x
 
-    Gamma = StochasticChebyshevTrace(scaled_op, shape=shape,
-                                     coefficients=c, n_probes=m)
+    Gamma = StochasticChebyshevTrace(scaled_op, shape=shape, coeffs=c, m=m)
 
     return Gamma
 
 
-def chebyshev_logdet(func, operator, shape, deg=20, m=100, num_iters=10,
-                     g=1.1, eps=1e-4):
+def chebyshev_logdet(operator, shape, deg=20, m=100, num_iters=10, g=1.1,
+                     eps=1e-4):
     """
     Estimates the log determinant of a positive definite matrix
     This corresponds to Algorithm 2 in Han et al. 2017
     """
-    # Find the largest eigenvalue
+    # Find the largest eigenvalue amongst the batch
     lmax = eigen_max(operator, shape, num_iters)
-    a, b = eps, g*lmax
+    a, b = eps, g*tf.reduce_max(lmax)
 
     # Rescales the operator
     def scaled_op(x):
         return operator(x) / (a+b)
 
-    Gamma = chebyshev_spectral_sum(func, scaled_op, a / (a + b), b / (a+b),
+    Gamma = chebyshev_spectral_sum(tf.log, scaled_op, a / (a + b), b / (a+b),
                                    shape=shape, deg=deg, m=m)
     return Gamma + shape[-1]*tf.log(a+b)

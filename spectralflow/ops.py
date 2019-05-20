@@ -16,9 +16,8 @@ def eigen_max(operator, shape, num_iters=10):
         return i + 1, u_ip1
 
     u = tf.get_variable("u", shape=shape,
-                        initializer=tf.truncated_normal_initializer(),
+                        initializer=tf.orthogonal_initializer(),
                         trainable=False)
-    u = _l2normalize(u)
 
     _, u_final = tf.while_loop(
         cond=lambda i, _1: i < num_iters,

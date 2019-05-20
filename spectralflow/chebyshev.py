@@ -27,7 +27,7 @@ def ChebyshevCoefficients(func, a, b, n):
     return c
 
 
-def StochasticChebyshevTrace(operator, shape, coeffs, n_probe=100):
+def StochasticChebyshevTrace(operator, shape, coeffs, m=100):
     """
     Computes the trace of the Chebyshev expansion of the function defined by
     `coeffs` and applied to `operator`, using the Hutchinson estimator
@@ -45,7 +45,7 @@ def StochasticChebyshevTrace(operator, shape, coeffs, n_probe=100):
         return i+1, wi, w1, s
 
     # Sample a rademacher tensor with desired size
-    v = tfp.math.random_rademacher([n_probe, ] + shape)
+    v = tfp.math.random_rademacher([m, ] + shape)
 
     # Initialize the iteration
     w0, w1 = v, operator(v)
