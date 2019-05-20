@@ -3,6 +3,8 @@ import tensorflow as tf
 from .chebyshev import ChebyshevCoefficients, StochasticChebyshevTrace
 from .ops import eigen_max
 
+__all__ = ["chebyshev_logdet"]
+
 
 def chebyshev_spectral_sum(func, operator, a, b, shape, deg=20, m=100):
     """
