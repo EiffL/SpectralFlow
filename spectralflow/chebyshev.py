@@ -14,16 +14,15 @@ def ChebyshevCoefficients(func, a, b, n):
     bma = 0.5 * (b - a)
     bpa = 0.5 * (b + a)
 
-    xk = tf.cos(math.pi * (tf.range(n, dtype=tf.float32) + 0.5)/(n + 1)) * bma + bpa
+    xk = tf.cos(math.pi * (tf.range(n+1, dtype=tf.float32) + 0.5)/(n + 1)) * bma + bpa
     f = func(xk)
 
-    i = tf.range(n, dtype=tf.float32)
+    i = tf.range(n+1, dtype=tf.float32)
     xk, _ = tf.meshgrid(i, i)
     fac = 2.0 / (n+1)
     c = fac * tf.reduce_sum(f * tf.cos(
         tf.transpose(xk) * (math.pi * (xk + 0.5) / (n+1))),
                             axis=1)
-
     return c
 
 
@@ -39,23 +38,20 @@ def StochasticChebyshevTrace(operator, shape, coeffs, m=100):
 
     WARNING: Will divide coeffs[0] by two
     """
-    def _chebyshev_recurrence(i, w1, w0, s):
-        wi = 2*operator(w1) - w0
-        s = s + coeffs[i]*wi
-        return i+1, wi, w1, s
-
     # Sample a rademacher tensor with desired size
     v = tfp.math.random_rademacher([m, ] + shape)
 
     # Initialize the iteration
     w0, w1 = v, operator(v)
+    
     s = 0.5*coeffs[0]*w0 + coeffs[1]*w1
 
-    _, _, _, final_s = tf.while_loop(
-        cond=lambda i, _1, _2, _3: i < coeffs.shape[0],
-        body=_chebyshev_recurrence,
-        loop_vars=(tf.constant(2, dtype=tf.int32), w1, w0, s))
+    for i in range(2, coeffs.shape[0]):
+        wi = 2.*operator(w1) - w0
+        s = s + coeffs[i]*wi
+        w0=w1*1.0
+        w1=wi*1.0
 
-    r = tf.einsum('ijk,ijl->ij', v, final_s)
-
+    r = tf.einsum('ijk,ijl->ij', v, s)
+    
     return tf.reduce_mean(r, axis=0)

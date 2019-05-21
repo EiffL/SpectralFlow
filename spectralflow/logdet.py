@@ -23,7 +23,7 @@ def chebyshev_spectral_sum(func, operator, a, b, shape, deg=20, m=100):
 
     # Rescales the operator
     def scaled_op(x):
-        return 2 * operator(x) / (b - a) - (b + a)/(b - a) * x
+        return 2. * operator(x) / (b - a) - (b + a)/(b - a) * x
 
     Gamma = StochasticChebyshevTrace(scaled_op, shape=shape, coeffs=c, m=m)
 
@@ -37,7 +37,7 @@ def chebyshev_logdet(operator, shape, deg=20, m=100, num_iters=10, g=1.1,
     This corresponds to Algorithm 2 in Han et al. 2017
     """
     # Find the largest eigenvalue amongst the batch
-    lmax = eigen_max(operator, shape, num_iters)
+    lmax = tf.stop_gradient(eigen_max(operator, shape, num_iters))
     a, b = eps, g*tf.reduce_max(lmax)
 
     # Rescales the operator
