@@ -52,6 +52,6 @@ def StochasticChebyshevTrace(operator, shape, coeffs, m=100):
         w0=w1*1.0
         w1=wi*1.0
 
-    r = tf.einsum('ijk,ijl->ij', v, s)
+    r = tf.einsum('ijk,ijk->ij', v, s)
     
     return tf.reduce_mean(r, axis=0)
