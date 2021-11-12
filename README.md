@@ -3,7 +3,7 @@ Tensorflow implementation of stochastic spectral-sums estimators
 
 Requirements: Tensorflow, Tensorflow Probability (only for Rademacher samples)
 
-Demo can be found [here](notebooks/StochasticChebyshev), in a nutshell, using an
+Demo can be found [here](notebooks/StochasticChebyshev.ipynb), in a nutshell, using an
 expansion to 50th degree of the log function:
 ```python
 import spectralflow as sf
